@@ -214,8 +214,8 @@ function dvRouter (options) {
         // Get callback and call it, providing initial routing
         var callback = this.getCallback();
         callback();
-        
-        // And add an event handler to hash changes
+
+        // And add an event handler to route on hash changes
         window.onhashchange = function () {
             callback();
         }
