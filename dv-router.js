@@ -211,15 +211,17 @@ function dvRouter (options) {
         // Load the options
         this.loadOptions();
 
-        // Get callback and call it, providing initial routing
+        // Get callback and call it with a timeout (so Router is available for the callback), providing initial routing
         var callback = this.getCallback();
-        callback();
+        setTimeout(function() {
+            callback();
+        }, 250);
 
         // And add an event handler to route on hash changes
         window.onhashchange = function () {
             callback();
         }
+        return this;
     }
-
     return this;
 }
