@@ -2,56 +2,26 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>dv-router.js</title>
-        
-        <!-- javascript -->
-        <script src="./dv-router.js" type="text/javascript"></script>
-        <script>
-        var routes = {
-            '': {
-                'controller': 'getHome'
-            },
-            'test/{id}': {
-                'controller': 'getTest',
-            },
-            'about': {
-                'controller': 'getAbout'
-            },
-            'about/{topic}': {
-                'controller': 'getAboutTopic'
-            }
-        }
-        var router = new dvRouter(routes);
+        <title>dv-router.js example</title>
 
-        function getHome(params) {
-            page.innerHTML = 'This is the home page. Click the links above!';
-        }
-        function getTest(params) {
-            page.innerHTML = 'Test page opened with id: ' + params.id;
-        }
-        function getAbout(params) {
-            page.innerHTML = 'dv-router.js is a simple javascript single-page router. This example is done in pure js but ideally you would use it together with jQuery.<br /><br /><a href="./#/about/topic-1">About topic 1</a> - <a href="./#/about/another-topic">About another topic</a>';
-        }
-        function getAboutTopic(params) {
-            page.innerHTML = 'about topic: ' + params.topic + '<br /><br /><a href="./#/about">back to about</a>';
-        }
-        </script>
+        <!-- Load the Router -->
+        <script src="./dv-router.js" type="text/javascript"></script>
         <style>
             .page {
                 border: 1px solid grey;
                 padding: 1em;
             }
         </style>
-        
+
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
     </head>
-    
+
     <body>
-    
+
         <header>
             <h1>dv-router.js example</h1>
         </header>
-    
+
         <nav>
             <a href="./#/">home</a>
             <a href="./#/test/34">test (param id:34)</a>
@@ -59,23 +29,66 @@
             <a href="./#/about">about</a>
         </nav>
         <br />
-        <div class="page">
-        
-        </div>
-        
+        <div class="page"></div>
+
         <script>
-            var pages = document.getElementsByClassName('page');
-            var page = pages[0];
-            // initial routing
-            if (!router.route(window.location.hash)) {
-                page.innerHTML = '404 - page not found';
+            /**
+             * We do all this here because of the lack of a proper document ready in vanilla js.
+             *
+             * If you use a library like jQuery or prototype (why would you?), this can be done in a nicer way.
+             */
+
+            // Get Page element
+            var Target = document.getElementsByClassName('page')[0];
+
+            // Define Callback
+            var Callback = function() {
+                // Get match from router based on hash
+                var content = Router.match(window.location.hash);
+                // Set the content
+                Router.setContent(content);
             }
-            // and on every hash change, more routing
-            window.onhashchange = function () {
-                if (!router.route(window.location.hash)) {
-                    page.innerHTML = '404 - page not found';
+
+            // Define Routes
+            var Routes = {
+                '': function(params) {
+                    var content = 'Home page...';
+                    return content;
+                },
+                'test/{id}': function(params) {
+                    console.log(params);
+                    var content = 'Test page opened with id: ' + params.id;
+                    return content;
+                },
+                'about': function(params) {
+                    var content = '';
+                    content += 'dv-router.js is a simple javascript single-page router.<br /><br />';
+                    content += 'This example is done in pure js but ideally you would use it together with jQuery.<br /><br />';
+                    content += '<a href="./#/about/topic-1">About topic 1</a> - <a href="./#/about/another-topic">About another topic</a>';
+                    return content;
+                },
+                'about/{topic}': function(params) {
+                    var content = 'About topic: ' + params.topic + '<br /><br /><a href="./#/about">back to about</a>';
+                    return content;
                 }
             }
+
+            // Define our routes and pass a function that accepts a params object
+            var Router = new dvRouter({
+                'routes'  : Routes,
+                'target'  : Target,
+                'callback': Callback
+            });
+            // Or we can configure a bare dvRouter. This makes it possible to add routes dynamically,
+            // Or set a different Callback for certain links.
+
+            // Router = new dvRouter();
+            // Router.setRoutes(Routes);
+            // Router.setTarget(Target);
+            // Router.setCallback(Callback);
+
+            // Running the router will route the current hash immediately, and add an event handler on hash changes
+            Router.run();
         </script>
     </body>
 
